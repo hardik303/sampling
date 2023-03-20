@@ -1,21 +1,31 @@
 import json
 import random
-
-
+random.seed(10)
 # Load input file
 with open('input.json', encoding='utf-8-sig') as f:
-    data = json.load(f)
-
+    raw_data = json.load(f)
 
 # Process file to nested array
 input_data = []
-for i in data:
+for i in raw_data:
     for key in i:
         input_data.append(i[key])
 
-print(input_data)
+# print(input_data)
 N = len(input_data)
 S = len(input_data[0])
+
+# map sentences
+map_ques = {}
+data = []
+start = ord('A')
+for i in range(N):
+    dum = []
+    for j in range(S):
+        map_ques[chr(start + i)+str(j+1)]=input_data[i][j]
+        dum.append(chr(start + i)+str(j+1))
+    data.append(dum)
+
 
 # Total comparisions = 15*20*20 = 6000
 # Target = 30 comparisions of 15 pairs = 450 comparisions
@@ -37,12 +47,12 @@ for i in range(0,num_survey):
         n2 = random.randint(0,N-2)
         if n2>=n1:
             n2+=1
-        s1 = random.choice(input_data[n1])
-        s2 = random.choice(input_data[n2])
+        s1 = random.choice(data[n1])
+        s2 = random.choice(data[n2])
         if (s1,s2) not in survey and (s2,s1) not in survey: survey.append((s1,s2))
     surveys.append(survey)
 
-print(surveys)
+# print(surveys)
 
 
 # Printing stats
@@ -82,7 +92,7 @@ for n1 in ['A','B','C','D','E','F']:
 
 # PRINT STATS PER SURVEY
 for i in range(0,num_survey):
-    print("SURVEY :",i," \n\n")
+    print("\n\nSURVEY :",i)
     for n1 in ['A','B','C','D','E','F']:
         for n2 in ['A','B','C','D','E','F']:
             if n1>=n2:continue
@@ -96,7 +106,9 @@ for i in range(0,num_survey):
 out_data = {}
 
 for survey_num in range(0,num_survey):
-    out_data[survey_num] = surveys[i]
+    out_data[survey_num] = []
+    for ques in surveys[survey_num]:
+        out_data[survey_num].append((map_ques[ques[0]],map_ques[ques[1]]))
 
 with open("output.json", "w") as f:
     json.dump(out_data, f)
